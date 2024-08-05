@@ -1,53 +1,23 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Data Table</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <title>Document</title>
 </head>
 <body>
-
-<h2>Data Table</h2>
-
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Value</th>
-            <!-- Add other headers as needed -->
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        // Check if data is an array
-        if (is_array($data)) {
-            // Iterate over the data and create table rows
-            foreach ($data as $item) {
-                echo "<tr>";
-                echo "<td>" . htmlspecialchars($item['id']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['name']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['value']) . "</td>";
-                // Add other data columns as needed
-                echo "</tr>";
-            }
-        } else {
-            echo "<tr><td colspan='3'>No data found</td></tr>";
-        }
-        ?>
-    </tbody>
-</table>
-
+  <h1 class="title">records</h1></div>
+  <div action=""><input placeholder= "Search for Crypto"type="text" name="searchbar" id="searchbar"></div>
+  <ul class="subtitles">
+      <li class="symbol-title">Symbol</li>
+      <li class="name-title">Name</li>
+      <li class="price-title">Price</li>
+  </ul>
+  <div class="dataaa"></div>
 </body>
+
+<script src="1.js"></script>
 </html>

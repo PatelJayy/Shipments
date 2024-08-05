@@ -1,90 +1,59 @@
 <?php
-// URL of the API
-$apiUrl = "https://run.mocky.io/v3/69f60a58-3a36-48c5-a9cf-b100b015950c";
+// Database connection settings
+$hostname = "localhost:3307";
+  $username = "root";
+  $password = "";
+  $dbname = "ship";
 
-// Fetch data from the API
-$response = file_get_contents($apiUrl);
+// Create connection
+$conn = new mysqli($hostname, $username, $password, $dbname);
 
-// Check if the response is not false
-if ($response === FALSE) {
-    die('Error occurred');
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-// Decode JSON data into PHP array
-$data = json_decode($response, true);
+// SQL query to fetch data
+$sql = "SELECT id, name, age, role, hireDate, isActive, salary, department, projectsCompleted, lastLogin, accessLevel FROM employees";
+$result = $conn->query($sql);
 
-// Check if json_decode succeeded
-if (json_last_error() !== JSON_ERROR_NONE) {
-    die('Error decoding JSON');
+// Check if there are results
+if ($result->num_rows > 0) {
+    // Output data of each row
+    echo "<table border='1'>";
+    echo "<tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Role</th>
+            <th>Hire Date</th>
+            <th>Active</th>
+            <th>Salary</th>
+            <th>Department</th>
+            <th>Projects Completed</th>
+            <th>Last Login</th>
+            <th>Access Level</th>
+          </tr>";
+    while($row = $result->fetch_assoc()) {
+        echo "<tr>
+                <td>" . $row["id"] . "</td>
+                <td>" . $row["name"] . "</td>
+                <td>" . $row["age"] . "</td>
+                <td>" . $row["role"] . "</td>
+                <td>" . $row["hireDate"] . "</td>
+                <td>" . ($row["isActive"] ? 'Yes' : 'No') . "</td>
+                <td>" . $row["salary"] . "</td>
+                <td>" . $row["department"] . "</td>
+                <td>" . $row["projectsCompleted"] . "</td>
+                <td>" . $row["lastLogin"] . "</td>
+                <td>" . $row["accessLevel"] . "</td>
+              </tr>";
+    }
+    echo "</table>";
+} else {
+    echo "0 results";
 }
+
+// Close connection
+$conn->close();
 ?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Data Table</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        table, th, td {
-            border: 1px solid black;
-        }
-        th, td {
-            padding: 10px;
-            text-align: left;
-        }
-    </style>
-</head>
-<body>
-
-<h2>Data Table</h2>
-
-<table>
-    <thead>
-        <tr>
-            <th>id</th>
-            <th>name</th>
-            <th>age</th>
-            <th>role</th>
-            <th>hireDate</th>
-            <th>isActive</th>
-            <th>salary</th>
-            <th>department</th>
-            <th>projectsCompleted</th>
-            <th>lastLogin</th>
-            <th>accessLevel</th>
-            <!-- Add other headers as needed -->
-        </tr>
-    </thead>
-    <tbody>
-        <?php
-        // Check if data is an array
-        if (is_array($data)) {
-            // Iterate over the data and create table rows
-            foreach ($data as $item) {
-                echo "<tr>";
-                echo "<td>" . htmlspecialchars($item['id']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['name']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['age']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['role']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['hireDate']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['isActive']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['salary']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['department']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['projectsCompleted']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['lastLogin']) . "</td>";
-                echo "<td>" . htmlspecialchars($item['accessLevel']) . "</td>";
-                // Add other data columns as needed
-                echo "</tr>";
-            }
-        } else {
-            echo "<tr><td colspan='5'>No data found</td></tr>";
-        }
-        ?>
-    </tbody>
-</table>
-
-</body>
-</html>
