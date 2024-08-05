@@ -12,4 +12,4 @@ import data.sql from cloned repository
 
 then : http://localhost/shipments/filter.php
 
-http://localhost/phpmyadmin/index.php?route=/sql&pos=0&db=ship&table=employees
+      : http://localhost/phpmyadmin/index.php?route=/sql&pos=0&db=ship&table=employees
