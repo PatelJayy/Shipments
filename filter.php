@@ -7,9 +7,12 @@
 <body>
     <h1>Employee Data</h1>
     <form method="POST" action="">
-        <h3>Integer Filters</h3>
+        <h3>Search</h3>
+        <input type="text" name="search" id="search">
+        <h1>Integer Filters</h1>
+        <h3>for age</h3>
         <label for="age">Age:</label>
-        <select name="age_operator">
+        <select name="ageOperator">
             <option value="=">=</option>
             <option value="<"><</option>
             <option value="<="><=</option>
@@ -18,10 +21,35 @@
             <option value="!=">!=</option>
         </select>
         <input type="number" name="age" id="age">
-        
-        <h3>String Filters</h3>
+
+        <h3>for salary</h3>
+        <label for="salary">salary:</label>
+        <select name="salaryOperator">
+            <option value="=">=</option>
+            <option value="<"><</option>
+            <option value="<="><=</option>
+            <option value=">">></option>
+            <option value=">=">>=</option>
+            <option value="!=">!=</option>
+        </select>
+        <input type="number" name="salary" id="salary">   
+
+        <h3>for projects completed</h3>
+        <label for="projects">projects:</label>
+        <select name="projectsOperator">
+            <option value="=">=</option>
+            <option value="<"><</option>
+            <option value="<="><=</option>
+            <option value=">">></option>
+            <option value=">=">>=</option>
+            <option value="!=">!=</option>
+        </select>
+        <input type="number" name="projects" id="projects">
+
+        <h1>String Filters</h1>
+        <h3>for name</h3>
         <label for="name">Name:</label>
-        <select name="name_operator">
+        <select name="nameOperator">
             <option value="contains">Contains</option>
             <option value="not_contains">Not Contains</option>
             <option value="=">=</option>
@@ -33,9 +61,35 @@
         </select>
         <input type="text" name="name" id="name">
         
+        <h3>for role</h3>
+        <label for="role">Role:</label>
+        <select name="roleOperator">
+            <option value="contains">Contains</option>
+            <option value="not_contains">Not Contains</option>
+            <option value="=">=</option>
+            <option value="!=">!=</option>
+            <option value="starts_with">Starts With</option>
+            <option value="ends_with">Ends With</option>
+            <option value="is_null">Is Null</option>
+            <option value="is_not_null">Is Not Null</option>
+        </select>
+        <input type="text" name="role" id="role">
+        
+        <h3>for Department</h3>
+        <label for="department">Department:</label>
+        <select name="departmentOperator">
+            <option value="=">=</option>
+            <option value="!=">!=</option>
+            <option value="in">In</option>
+            <option value="not_in">Not In</option>
+            <option value="is_null">Is Null</option>
+            <option value="is_not_null">Is Not Null</option>
+        </select>
+        <input type="text" name="department" id="department">
+
         <h3>Date Filters</h3>
         <label for="hireDate">Hire Date:</label>
-        <select name="hireDate_operator">
+        <select name="hireDateOperator">
             <option value="=">=</option>
             <option value="<"><</option>
             <option value="<="><=</option>
@@ -47,31 +101,15 @@
             <option value="range">Range</option>
         </select>
         <input type="date" name="hireDate" id="hireDate">
-        <label for="hireDate_end">to</label>
-        <input type="date" name="hireDate_end" id="hireDate_end">
-        
-        <h3>Enum Filters</h3>
-        <label for="department">Department:</label>
-        <select name="department_operator">
-            <option value="=">=</option>
-            <option value="!=">!=</option>
-            <option value="in">In</option>
-            <option value="not_in">Not In</option>
-            <option value="is_null">Is Null</option>
-            <option value="is_not_null">Is Not Null</option>
-        </select>
-        <input type="text" name="department" id="department">
-        
+               
         <h3>Boolean Filters</h3>
         <label for="isActive">Active:</label>
-        <select name="isActive_operator">
+        <select name="isActiveOperator">
             <option value="=">Equals</option>
-            <option value="is_null">Is Null</option>
-            <option value="is_not_null">Is Not Null</option>
-        </select>
+        </select> 
         <select name="isActive">
-            <option value="1">True</option>
-            <option value="0">False</option>
+            <option value="1">Yes</option>
+            <option value="0">No</option>
         </select>
         
         <button type="submit">Filter</button>
@@ -79,100 +117,147 @@
     <hr>
 
 <?php
-// Database connection settings
+
+// connecting to mySql database for executing querries
+
 $hostname = "localhost:3307";
   $username = "root";
   $password = "";
   $dbname = "ship";
 
-// Create connection
+
 $conn = new mysqli($hostname, $username, $password, $dbname);
 
-// Check connection
+
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Initialize SQL query
+// Dynamic sql querry for all
+
 $sql = "SELECT id, name, age, role, hireDate, isActive, salary, department, projectsCompleted, lastLogin, accessLevel FROM employees WHERE 1=1";
 
-// Integer Filter for Age
-if (!empty($_POST['age']) && !empty($_POST['age_operator'])) {
+// Integer Filter for Salary
+
+if (!empty($_POST['salary']) && !empty($_POST['salaryOperator'])) {
+    $salary = intval($_POST['salary']);
+    $salaryOperator = $_POST['salaryOperator'];
+    $sql .= " AND salary $salaryOperator $salary";
+}
+
+// Integer Filter for projects completed
+
+if (!empty($_POST['project']) && !empty($_POST['projectOperator'])) {
+    $project = intval($_POST['project']);
+    $projectOperator = $_POST['projectOperator'];
+    $sql .= " AND project $projectOperator $project";
+}
+
+
+// Integer Filter for salary
+if (!empty($_POST['age']) && !empty($_POST['ageOperator'])) {
     $age = intval($_POST['age']);
-    $age_operator = $_POST['age_operator'];
-    $sql .= " AND age $age_operator $age";
+    $ageOperator = $_POST['ageOperator'];
+    $sql .= " AND age $ageOperator $age";
 }
 
 // String Filter for Name
-if (!empty($_POST['name_operator'])) {
-    $name_operator = $_POST['name_operator'];
+if (!empty($_POST['name']) && !empty($_POST['nameOperator'])) {
+    $nameOperator = $_POST['nameOperator'];
     $name = $_POST['name'];
-    if ($name_operator == 'contains') {
+    if ($nameOperator == 'contains') {
         $sql .= " AND name LIKE '%$name%'";
-    } elseif ($name_operator == 'not_contains') {
+    } elseif ($nameOperator == 'not_contains') {
         $sql .= " AND name NOT LIKE '%$name%'";
-    } elseif ($name_operator == 'starts_with') {
+    } elseif ($nameOperator == 'starts_with') {
         $sql .= " AND name LIKE '$name%'";
-    } elseif ($name_operator == 'ends_with') {
+    } elseif ($nameOperator == 'ends_with') {
         $sql .= " AND name LIKE '%$name'";
-    } elseif ($name_operator == 'is_null') {
+    } elseif ($nameOperator == 'is_null') {
         $sql .= " AND name IS NULL";
-    } elseif ($name_operator == 'is_not_null') {
+    } elseif ($nameOperator == 'is_not_null') {
         $sql .= " AND name IS NOT NULL";
     } else {
-        $sql .= " AND name $name_operator '$name'";
+        $sql .= " AND name $nameOperator '$name'";
+    }
+}
+
+// String Filter for role
+if (!empty($_POST['role']) && !empty($_POST['roleOperator'])) {
+    $roleOperator = $_POST['roleOperator'];
+    $role = $_POST['role'];
+    if ($roleOperator == 'contains') {
+        $sql .= " AND role LIKE '%$role%'";
+    } elseif ($roleOperator == 'not_contains') {
+        $sql .= " AND role NOT LIKE '%$role%'";
+    } elseif ($roleOperator == 'starts_with') {
+        $sql .= " AND role LIKE '$role%'";
+    } elseif ($roleOperator == 'ends_with') {
+        $sql .= " AND role LIKE '%$role'";
+    } elseif ($roleOperator == 'is_null') {
+        $sql .= " AND role IS NULL";
+    } elseif ($roleOperator == 'is_not_null') {
+        $sql .= " AND role IS NOT NULL";
+    } else {
+        $sql .= " AND role $roleOperator '$role'";
     }
 }
 
 // Date Filter for Hire Date
-if (!empty($_POST['hireDate_operator'])) {
-    $hireDate_operator = $_POST['hireDate_operator'];
+if (!empty($_POST['hireDateOperator'])) {
+    $hireDateOperator = $_POST['hireDateOperator'];
     $hireDate = $_POST['hireDate'];
-    if ($hireDate_operator == 'range') {
+    if ($hireDateOperator == 'range') {
         $hireDate_end = $_POST['hireDate_end'];
-        $sql .= " AND hireDate BETWEEN '$hireDate' AND '$hireDate_end'";
-    } elseif ($hireDate_operator == 'is_null') {
+        if (!empty($hireDate) && !empty($hireDate_end)) {
+            $sql .= " AND hireDate BETWEEN '$hireDate' AND '$hireDate_end'";
+        }
+    } elseif ($hireDateOperator == 'is_null') {
         $sql .= " AND hireDate IS NULL";
-    } elseif ($hireDate_operator == 'is_not_null') {
+    } elseif ($hireDateOperator == 'is_not_null') {
         $sql .= " AND hireDate IS NOT NULL";
-    } else {
-        $sql .= " AND hireDate $hireDate_operator '$hireDate'";
+    } elseif (!empty($hireDate)) {
+        $sql .= " AND hireDate $hireDateOperator '$hireDate'";
     }
 }
 
-// Enum Filter for Department
-if (!empty($_POST['department_operator'])) {
-    $department_operator = $_POST['department_operator'];
+// department filters
+
+if (!empty($_POST['departmentOperator'])) {
+    $departmentOperator = $_POST['departmentOperator'];
     $department = $_POST['department'];
-    if ($department_operator == 'in' || $department_operator == 'not_in') {
+    if ($departmentOperator == 'in' || $departmentOperator == 'not_in') {
         $departments = explode(',', $department);
         $departments = array_map('trim', $departments);
         $departments = "'" . implode("','", $departments) . "'";
-        if ($department_operator == 'in') {
+        if ($departmentOperator == 'in') {
             $sql .= " AND department IN ($departments)";
         } else {
             $sql .= " AND department NOT IN ($departments)";
         }
-    } elseif ($department_operator == 'is_null') {
+    } elseif ($departmentOperator == 'is_null') {
         $sql .= " AND department IS NULL";
-    } elseif ($department_operator == 'is_not_null') {
+    } elseif ($departmentOperator == 'is_not_null') {
         $sql .= " AND department IS NOT NULL";
-    } else {
-        $sql .= " AND department $department_operator '$department'";
+    } elseif (!empty($department)) {
+        $sql .= " AND department $departmentOperator '$department'";
     }
 }
 
 // Boolean Filter for Active
-if (!empty($_POST['isActive_operator'])) {
-    $isActive_operator = $_POST['isActive_operator'];
-    if ($isActive_operator == 'is_null') {
-        $sql .= " AND isActive IS NULL";
-    } elseif ($isActive_operator == 'is_not_null') {
-        $sql .= " AND isActive IS NOT NULL";
-    } else {
-        $isActive = intval($_POST['isActive']);
-        $sql .= " AND isActive = $isActive";
+
+if (!empty($_POST['isActiveOperator'])) {
+    $isActiveOperator = $_POST['isActiveOperator'];
+    if ($isActiveOperator == 'Equals') {
+        $sql .= " AND isActive = '$isActive'";
     }
+    //     $sql .= " AND isActive IS NULL";
+    // } elseif ($isActiveOperator == 'is_not_null') {
+    //     $sql .= " AND isActive IS NOT NULL";
+    // } elseif (!empty($_POST['isActive'])) {
+    //     $isActive = intval($_POST['isActive']);
+    //     $sql .= " AND isActive = $isActive";
+    // }
 }
 
 $result = $conn->query($sql);
@@ -206,6 +291,7 @@ if ($result->num_rows > 0) {
                 <td>" . $row["department"] . "</td>
                 <td>" . $row["projectsCompleted"] . "</td>
                 <td>" . $row["lastLogin"] . "</td>
+                <td>" . $row["accessLevel"] . "</td>
                 <td>" . $row["accessLevel"] . "</td>
               </tr>";
     }
