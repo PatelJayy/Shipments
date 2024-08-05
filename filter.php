@@ -34,8 +34,8 @@
         </select>
         <input type="number" name="salary" id="salary">   
 
-        <!-- <h3>for projects_completed</h3>
-        <label for="project">project:</label>
+        <h3>for projects</h3>
+        <label for="projects">projects:</label>
         <select name="projectsCompleted">
             <option value="=">=</option>
             <option value="<"><</option>
@@ -44,7 +44,7 @@
             <option value=">=">>=</option>
             <option value="!=">!=</option>
         </select>
-        <input type="number" name="project" id="project"> -->
+        <input type="number" name="projects" id="projects">
 
         <h1>String Filters</h1>
         <h3>for name</h3>
@@ -139,7 +139,7 @@ if ($conn->connect_error) {
 
 $sql = "SELECT id, name, age, role, hireDate, isActive, salary, department, projectsCompleted, lastLogin, accessLevel FROM employees WHERE 1=1";
 
-// Integer Filter for Salary
+//Filter for Salary
 
 if (!empty($_POST['salary']) && !empty($_POST['salaryOperator'])) {
     $salary = intval($_POST['salary']);
@@ -147,7 +147,7 @@ if (!empty($_POST['salary']) && !empty($_POST['salaryOperator'])) {
     $sql .= " AND salary $salaryOperator $salary";
 }
 
-// Integer Filter for projects
+//Filter for projects
 
 if (!empty($_POST['project']) && !empty($_POST['projectsCompleted'])) {
     $project = intval($_POST['project']);
@@ -155,14 +155,16 @@ if (!empty($_POST['project']) && !empty($_POST['projectsCompleted'])) {
     $sql .= " AND project $projectsCompleted $project";
 }
 
-// Integer Filter for salary
+// salary filter
+
 if (!empty($_POST['age']) && !empty($_POST['ageOperator'])) {
     $age = intval($_POST['age']);
     $ageOperator = $_POST['ageOperator'];
     $sql .= " AND age $ageOperator $age";
 }
 
-// String Filter for Name
+// Name filter
+
 if (!empty($_POST['name']) && !empty($_POST['nameOperator'])) {
     $nameOperator = $_POST['nameOperator'];
     $name = $_POST['name'];
@@ -183,7 +185,31 @@ if (!empty($_POST['name']) && !empty($_POST['nameOperator'])) {
     }
 }
 
-// String Filter for role
+
+// Name filter
+
+if (!empty($_POST['projects']) && !empty($_POST['projectsCompleted'])) {
+    $projectsCompleted = $_POST['projectsCompleted'];
+    $projects = $_POST['projects'];
+    if ($projectsCompleted == 'contains') {
+        $sql .= " AND projects LIKE '%$projects%'";
+    } elseif ($projectsCompleted == 'not_contains') {
+        $sql .= " AND projects NOT LIKE '%$projects%'";
+    } elseif ($projectsCompleted == 'starts_with') {
+        $sql .= " AND projects LIKE '$projects%'";
+    } elseif ($projectsCompleted == 'ends_with') {
+        $sql .= " AND projects LIKE '%$projects'";
+    } elseif ($projectsCompleted == 'is_null') {
+        $sql .= " AND projects IS NULL";
+    } elseif ($projectsCompleted == 'is_not_null') {
+        $sql .= " AND projects IS NOT NULL";
+    } else {
+        $sql .= " AND projects $projectsCompleted '$projects'";
+    }
+}
+
+// role filter
+
 if (!empty($_POST['role']) && !empty($_POST['roleOperator'])) {
     $roleOperator = $_POST['roleOperator'];
     $role = $_POST['role'];
@@ -204,7 +230,8 @@ if (!empty($_POST['role']) && !empty($_POST['roleOperator'])) {
     }
 }
 
-// Date Filter for Hire Date
+// date filter
+
 if (!empty($_POST['hireDateOperator'])) {
     $hireDateOperator = $_POST['hireDateOperator'];
     $hireDate = $_POST['hireDate'];
@@ -244,7 +271,7 @@ if (!empty($_POST['department']) && !empty($_POST['departmentOperator'])) {
     }
 }
 
-// Boolean Filter for Active
+// filter for boolean yes/no
 
 if (!empty($_POST['isActiveOperator'])) {
     $isActiveOperator = $_POST['isActiveOperator'];
