@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Employee Data</title>
+    <title>Shipments Data</title>
 </head>
 <body>
-    <h1>Employee Data</h1>
+    <h1>Shipments Data</h1>
     <form method="POST" action="">
-        <h3>Search</h3>
-        <input type="text" name="search" id="search">
+        <!-- <h3>Search</h3>
+        <input type="text" name="search" id="search"> -->
         <h1>Integer Filters</h1>
         <h3>for age</h3>
         <label for="age">Age:</label>
@@ -34,9 +34,9 @@
         </select>
         <input type="number" name="salary" id="salary">   
 
-        <h3>for projects completed</h3>
-        <label for="projects">projects:</label>
-        <select name="projectsOperator">
+        <!-- <h3>for projects_completed</h3>
+        <label for="project">project:</label>
+        <select name="projectsCompleted">
             <option value="=">=</option>
             <option value="<"><</option>
             <option value="<="><=</option>
@@ -44,7 +44,7 @@
             <option value=">=">>=</option>
             <option value="!=">!=</option>
         </select>
-        <input type="number" name="projects" id="projects">
+        <input type="number" name="project" id="project"> -->
 
         <h1>String Filters</h1>
         <h3>for name</h3>
@@ -75,13 +75,15 @@
         </select>
         <input type="text" name="role" id="role">
         
-        <h3>for Department</h3>
-        <label for="department">Department:</label>
+        <h3>for department</h3>
+        <label for="department">department:</label>
         <select name="departmentOperator">
+            <option value="contains">Contains</option>
+            <option value="not_contains">Not Contains</option>
             <option value="=">=</option>
             <option value="!=">!=</option>
-            <option value="in">In</option>
-            <option value="not_in">Not In</option>
+            <option value="starts_with">Starts With</option>
+            <option value="ends_with">Ends With</option>
             <option value="is_null">Is Null</option>
             <option value="is_not_null">Is Not Null</option>
         </select>
@@ -109,7 +111,7 @@
         </select> 
         <select name="isActive">
             <option value="1">Yes</option>
-            <option value="0">No</option>
+            <option value="empty">No</option>
         </select>
         
         <button type="submit">Filter</button>
@@ -145,14 +147,13 @@ if (!empty($_POST['salary']) && !empty($_POST['salaryOperator'])) {
     $sql .= " AND salary $salaryOperator $salary";
 }
 
-// Integer Filter for projects completed
+// Integer Filter for projects
 
-if (!empty($_POST['project']) && !empty($_POST['projectOperator'])) {
+if (!empty($_POST['project']) && !empty($_POST['projectsCompleted'])) {
     $project = intval($_POST['project']);
-    $projectOperator = $_POST['projectOperator'];
-    $sql .= " AND project $projectOperator $project";
+    $projectsCompleted = $_POST['projectsCompleted'];
+    $sql .= " AND project $projectsCompleted $project";
 }
-
 
 // Integer Filter for salary
 if (!empty($_POST['age']) && !empty($_POST['ageOperator'])) {
@@ -223,23 +224,22 @@ if (!empty($_POST['hireDateOperator'])) {
 
 // department filters
 
-if (!empty($_POST['departmentOperator'])) {
+if (!empty($_POST['department']) && !empty($_POST['departmentOperator'])) {
     $departmentOperator = $_POST['departmentOperator'];
     $department = $_POST['department'];
-    if ($departmentOperator == 'in' || $departmentOperator == 'not_in') {
-        $departments = explode(',', $department);
-        $departments = array_map('trim', $departments);
-        $departments = "'" . implode("','", $departments) . "'";
-        if ($departmentOperator == 'in') {
-            $sql .= " AND department IN ($departments)";
-        } else {
-            $sql .= " AND department NOT IN ($departments)";
-        }
+    if ($departmentOperator == 'contains') {
+        $sql .= " AND department LIKE '%$department%'";
+    } elseif ($departmentOperator == 'not_contains') {
+        $sql .= " AND department NOT LIKE '%$department%'";
+    } elseif ($departmentOperator == 'starts_with') {
+        $sql .= " AND department LIKE '$department%'";
+    } elseif ($departmentOperator == 'ends_with') {
+        $sql .= " AND department LIKE '%$department'";
     } elseif ($departmentOperator == 'is_null') {
         $sql .= " AND department IS NULL";
     } elseif ($departmentOperator == 'is_not_null') {
         $sql .= " AND department IS NOT NULL";
-    } elseif (!empty($department)) {
+    } else {
         $sql .= " AND department $departmentOperator '$department'";
     }
 }
@@ -248,23 +248,20 @@ if (!empty($_POST['departmentOperator'])) {
 
 if (!empty($_POST['isActiveOperator'])) {
     $isActiveOperator = $_POST['isActiveOperator'];
-    if ($isActiveOperator == 'Equals') {
-        $sql .= " AND isActive = '$isActive'";
+    if (!empty($_POST['isActive'])) {
+            $isActive = intval($_POST['isActive']);
+            $sql .= " AND isActive = $isActive";
     }
-    //     $sql .= " AND isActive IS NULL";
-    // } elseif ($isActiveOperator == 'is_not_null') {
-    //     $sql .= " AND isActive IS NOT NULL";
-    // } elseif (!empty($_POST['isActive'])) {
-    //     $isActive = intval($_POST['isActive']);
-    //     $sql .= " AND isActive = $isActive";
-    // }
 }
 
 $result = $conn->query($sql);
 
-// Check if there are results
+// checking for result
+
 if ($result->num_rows > 0) {
-    // Output data of each row
+    
+    // format of table
+
     echo "<table border='1'>";
     echo "<tr>
             <th>ID</th>
